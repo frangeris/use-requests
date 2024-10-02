@@ -1,10 +1,10 @@
 import Options from "./options";
-import { ServiceResponse, Path, Operation } from "./types";
+import { ServiceResponse, RequestPath, PatchOperation } from "./types";
 
 export class Service {
   public headers: Headers = new Headers();
 
-  private base: string;
+  private baseURL: string;
   private resource: string;
   private controller: AbortController;
 
@@ -14,15 +14,17 @@ export class Service {
       throw new Error("Options not initialized, use initServices");
     }
 
-    this.base = opts?.base;
+    this.baseURL = opts?.baseURL;
     this.resource = resource;
     this.controller = new AbortController();
   }
 
-  private request(opts: RequestInit & { path?: Path }): Promise<Response> {
+  private request(
+    opts: RequestInit & { path?: RequestPath }
+  ): Promise<Response> {
     const { path, ...rest } = opts;
-    const { base, headers } = this;
-    const url = base + this.build(path);
+    const { baseURL, headers } = this;
+    const url = baseURL + this.build(path);
     const request = new Request(url, {
       headers,
       signal: this.controller.signal,
@@ -32,7 +34,7 @@ export class Service {
     return fetch(request);
   }
 
-  private build(path?: Path) {
+  private build(path?: RequestPath) {
     if (!path) {
       return "";
     }
@@ -68,13 +70,8 @@ export class Service {
     };
   }
 
-  // utils
-  private abort() {
-    this.controller.abort();
-  }
-
   // HTTP methods
-  async get<T>(path?: Path): ServiceResponse<T> {
+  async get<T>(path?: RequestPath): ServiceResponse<T> {
     const request = await this.request({
       path,
       method: "get",
@@ -83,52 +80,62 @@ export class Service {
     return this.response<T>(request);
   }
 
-  async head(path?: Path): Promise<Response> {
-    const request = await this.request({
-      path,
-      method: "head",
-    });
+  /*
+	async head(path?: RequestPath): Promise<Response> {
+		const request = await this.request({
+			path,
+			method: "head",
+		});
 
-    return this.response<void>(request);
+		return this.response<void>(request);
+	}
+
+	async post<T>(payload: any, path?: RequestPath): ServiceResponse<T> {
+		const request = await this.request({
+			path,
+			method: "post",
+			body: JSON.stringify(payload),
+		});
+
+		return this.response<T>(request);
+	}
+
+	async put<T>(payload: any, path?: RequestPath): ServiceResponse<T> {
+		const request = await this.request({
+			path,
+			method: "put",
+			body: JSON.stringify(payload),
+		});
+
+		return this.response<T>(request);
+	}
+
+	async delete<T>(path?: RequestPath): ServiceResponse<T> {
+		const request = await this.request({
+			path,
+			method: "delete",
+		});
+
+		return this.response<T>(request);
+	}
+
+	async patch<T>(
+		ops: PatchOperation[],
+		path?: RequestPath
+	): ServiceResponse<T> {
+		const request = await this.request({
+			path,
+			method: "patch",
+		});
+
+		return this.response<T>(request);
+	}
+
+  private abort() {
+    this.controller.abort();
   }
 
-  async post<T>(payload: any, path?: Path): ServiceResponse<T> {
-    const request = await this.request({
-      path,
-      method: "post",
-      body: JSON.stringify(payload),
-    });
-
-    return this.response<T>(request);
-  }
-
-  async put<T>(payload: any, path?: Path): ServiceResponse<T> {
-    const request = await this.request({
-      path,
-      method: "put",
-      body: JSON.stringify(payload),
-    });
-
-    return this.response<T>(request);
-  }
-
-  async delete<T>(path?: Path): ServiceResponse<T> {
-    const request = await this.request({
-      path,
-      method: "delete",
-    });
-
-    return this.response<T>(request);
-  }
-
-  async patch<T>(ops: Operation[], path?: Path): ServiceResponse<T> {
-    const request = await this.request({
-      path,
-      method: "patch",
-    });
-
-    return this.response<T>(request);
-  }
+		*/
 }
 
 export default Service;
