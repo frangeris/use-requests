@@ -1,16 +1,13 @@
 {
-  "compilerOptions": {
-    "target": "esnext",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "strict": true,
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "noEmit": true
-  },
-  "exclude": ["node_modules", "jest.config.js"],
-  "typeRoots": ["./node_modules/@types"]
+	"compilerOptions": {
+		"target": "esnext",
+		"module": "commonjs",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"strict": true,
+		"baseUrl": "./",
+		"noEmit": true
+	},
+	"exclude": ["node_modules", "jest.config.js"],
+	"typeRoots": ["./node_modules/@types"]
 }
