@@ -50,8 +50,8 @@ Then, you'll define your API endpoints using an [enum](https://www.typescriptlan
 
 ```ts
 export enum Api {
-  config = "/config",
-  test = "/test/:id",
+  users = "/users",
+  userById = "/users/:id",
 }
 ```
 
