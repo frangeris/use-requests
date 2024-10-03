@@ -80,62 +80,50 @@ export class Service<P> {
     return this.response<T>(request);
   }
 
-  /*
-	async head(path?: RequestPath): Promise<Response> {
-		const request = await this.request({
-			path,
-			method: "head",
-		});
+  async post<T>(payload: any, path?: RequestPath<P>): ServiceResponse<T> {
+    const request = await this.request({
+      path,
+      method: "post",
+      body: JSON.stringify(payload),
+    });
 
-		return this.response<void>(request);
-	}
-
-	async post<T>(payload: any, path?: RequestPath): ServiceResponse<T> {
-		const request = await this.request({
-			path,
-			method: "post",
-			body: JSON.stringify(payload),
-		});
-
-		return this.response<T>(request);
-	}
-
-	async put<T>(payload: any, path?: RequestPath): ServiceResponse<T> {
-		const request = await this.request({
-			path,
-			method: "put",
-			body: JSON.stringify(payload),
-		});
-
-		return this.response<T>(request);
-	}
-
-	async delete<T>(path?: RequestPath): ServiceResponse<T> {
-		const request = await this.request({
-			path,
-			method: "delete",
-		});
-
-		return this.response<T>(request);
-	}
-
-	async patch<T>(
-		ops: PatchOperation[],
-		path?: RequestPath
-	): ServiceResponse<T> {
-		const request = await this.request({
-			path,
-			method: "patch",
-		});
-
-		return this.response<T>(request);
-	}
-
-  private abort() {
-    this.controller.abort();
+    return this.response<T>(request);
   }
 
-		*/
+  async put<T>(payload: any, path?: RequestPath<P>): ServiceResponse<T> {
+    const request = await this.request({
+      path,
+      method: "put",
+      body: JSON.stringify(payload),
+    });
+
+    return this.response<T>(request);
+  }
+
+  async delete<T>(path?: RequestPath<P>): ServiceResponse<T> {
+    const request = await this.request({
+      path,
+      method: "delete",
+    });
+
+    return this.response<T>(request);
+  }
+
+  async patch<T>(
+    ops: PatchOperation[],
+    path?: RequestPath<P>
+  ): ServiceResponse<T> {
+    const request = await this.request({
+      path,
+      method: "patch",
+    });
+
+    return this.response<T>(request);
+  }
+
+  // private abort() {
+  //   this.controller.abort();
+  // }
 }
 
 export default Service;
