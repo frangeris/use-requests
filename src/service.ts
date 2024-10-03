@@ -1,9 +1,8 @@
 import Options from "./options";
 import { ServiceResponse, RequestPath, PatchOperation } from "./types";
 
-export class Service {
+export class Service<P> {
   public headers: Headers = new Headers();
-
   private baseURL: string;
   private resource: string;
   private controller: AbortController;
@@ -20,7 +19,7 @@ export class Service {
   }
 
   private request(
-    opts: RequestInit & { path?: RequestPath }
+    opts: RequestInit & { path?: RequestPath<P> }
   ): Promise<Response> {
     const { path, ...rest } = opts;
     const { baseURL, headers } = this;
@@ -34,7 +33,7 @@ export class Service {
     return fetch(request);
   }
 
-  private build(path?: RequestPath) {
+  private build(path?: RequestPath<P>) {
     if (!path) {
       return "";
     }
@@ -48,6 +47,7 @@ export class Service {
     const { params, query } = path;
     if (params) {
       for (const k in params) {
+        // @ts-ignore
         url = url.replace(`:${k}`, `${params[k]}`);
       }
     } else if (url.includes(":")) {
@@ -71,7 +71,7 @@ export class Service {
   }
 
   // HTTP methods
-  async get<T>(path?: RequestPath): ServiceResponse<T> {
+  async get<T>(path?: RequestPath<P>): ServiceResponse<T> {
     const request = await this.request({
       path,
       method: "get",
