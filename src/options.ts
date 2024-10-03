@@ -1,8 +1,8 @@
-import { Opts } from "./types";
+import { InitOptions } from "./types";
 
 export class Options {
   static #instance: Options;
-  public opts?: Opts;
+  public opts?: InitOptions;
 
   public static instance(): Options {
     if (!Options.#instance) {

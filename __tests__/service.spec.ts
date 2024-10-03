@@ -8,7 +8,7 @@ global.fetch = jest.fn(() => ({
 describe("service", () => {
   beforeEach(() => {
     Options.instance = jest.fn().mockReturnValue({
-      opts: { base: "http://example.com" },
+      opts: { baseURL: "http://example.com" },
     });
   });
 
@@ -24,8 +24,10 @@ describe("service", () => {
     });
 
     it("should replace parameters in resource", () => {
-      const service = new Service("/resource/:id");
+      const service = new Service<unknown>("/resource/:id");
       const path = { params: { id: "123" } };
+
+      // @ts-ignore
       expect(service["build"](path)).toBe("/resource/123");
     });
 
@@ -43,6 +45,8 @@ describe("service", () => {
     it("should build a URL with both path and query parameters", () => {
       const service = new Service("/resource/:id");
       const path = { params: { id: "123" }, query: { search: "test" } };
+
+      // @ts-ignore
       expect(service["build"](path)).toBe("/resource/123?search=test");
     });
   });

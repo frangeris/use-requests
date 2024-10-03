@@ -14,7 +14,7 @@ describe("options", () => {
 
   it("should set and retrieve opts correctly", () => {
     const instance = Options.instance();
-    const opts = { base: "http://example.com" };
+    const opts = { baseURL: "http://example.com" };
     instance.opts = opts;
     expect(instance.opts).toEqual(opts);
   });
