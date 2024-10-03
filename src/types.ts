@@ -5,25 +5,23 @@ export type InitOptions = {
   headers?: Headers;
 };
 
-export type Services<T> = { [P in keyof T]: Service };
+export type Services<T> = { [K in keyof T]: Service<T[K]> };
 
-export type ServiceResponse<T> = Promise<Response & { data: T }>;
+export type ServiceResponse<R> = Promise<Response & { data: R }>;
 
-export type ServiceRequest = RequestInit & { path?: RequestPath };
-
-export type RequestPath =
+export type RequestPath<P> =
   | {
-      // params?: Record<string, string | number>;
-      params?: ExtractParams<"/test/:id/users/:two/:third">;
+      params?: ExtractParams<P>;
       query?: Record<string, string | number>;
     }
   | string;
 
-type ExtractParams<T> = T extends `${infer Start}:${infer Param}/${infer Rest}`
-  ? { [k in Param | keyof ExtractParams<Rest>]: string | number }
-  : T extends `${infer Start}:${infer Param}`
-  ? { [k in Param]: string | number }
-  : never;
+export type ExtractParams<T> =
+  T extends `${infer Start}:${infer Param}/${infer Rest}`
+    ? { [k in Param | keyof ExtractParams<Rest>]: string | number }
+    : T extends `${infer Start}:${infer Param}`
+    ? { [k in Param]: string | number }
+    : never;
 
 export type PatchOperation = {
   path: string;
