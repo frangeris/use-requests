@@ -1,8 +1,8 @@
 import { Services } from "./types";
-import { getServices } from "./init";
+import context from "./context";
 
-export function useRequest<T>(): Services<T> {
-  return getServices();
+export function useRequest<T>() {
+  return context.useRequests as Services<T>;
 }
 
 export default useRequest;
