@@ -71,7 +71,7 @@ init("https://api.example.io/dev", { ...Api });
 
 By setting up this initialization, you ensure that every request you make using the `useRequests` hook will automatically target the correct API with the predefined endpoints.
 
-### Now, let's make request
+### ⚡️ Now, let's make some requests
 
 Once the module is initialized, you can easily make requests to the defined endpoints. Here's a snippet for requests:
 
