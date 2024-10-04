@@ -2,6 +2,9 @@ name: bump
 run-name: Bump package version
 
 on:
+  push:
+    tags:
+      - "*"
   workflow_run:
     workflows: ["publish"]
     types:
