@@ -76,7 +76,7 @@ By setting up this initialization, you ensure that every request you make using 
 Once the module is initialized, you can easily make requests to the defined endpoints. Here's a snippet for requests:
 
 ```ts
-import { useRequests, init } from "./src";
+import { useRequests, init } from "use-requests";
 
 type User = {};
 
