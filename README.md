@@ -97,6 +97,8 @@ const main = async () => {
 main();
 ```
 
+The `data` property is a wrapper around the `Response.json()` method that looks for `data` key in the response, in case that property exists, it will be returned as the representation of the response `body.data` casted to the generic type used, eg: `User[]` or `User`.
+
 The test endpoint is accessed with an id parameter. You can also set headers (like authorization tokens) as needed.
 
 ---
@@ -117,8 +119,6 @@ Each method returned by `useRequests` is type-safe, meaning that the parameters 
 > Only dynamic path parameters `:param` and query strings are currently supported. Support for request bodies will be added in future versions.
 
 The response by any methods is an instance of [fetch Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object, which you can use to extract the data, status, headers, etc.
-
-The `data` property is a wrapper around the `Response.json()` method, which returns a promise that resolves to the JSON representation of the response body casted to the generic type used, eg: `User[]` or `User`.
 
 > [!WARNING]
 > Any parameters defined in the endpoint definition are required when calling the method. If you omit a required parameter, TypeScript will throw a compile-time error or an exception will be thrown at runtime.
