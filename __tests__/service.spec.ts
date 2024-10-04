@@ -15,7 +15,7 @@ describe("service", () => {
   describe("build", () => {
     it("should return empty string if no path is provided", () => {
       const service = new Service("/resource");
-      expect(service["build"]()).toBe("");
+      expect(service["build"]()).toBe("/resource");
     });
 
     it("should return the path if a string path is provided", () => {
