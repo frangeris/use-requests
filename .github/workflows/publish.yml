@@ -34,7 +34,8 @@ jobs:
       - name: Update package.json
         run: npm version ${{ env.VERSION }} --no-git-tag-version --allow-same-version
 
-      - uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Bump version
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           branch: main
           commit_message: "bump: Upgrade version to ${{ env.VERSION }}"
