@@ -2,9 +2,6 @@ name: bump
 run-name: Bump package version
 
 on:
-  push:
-    tags:
-      - "*"
   workflow_run:
     workflows: ["publish"]
     types:
@@ -16,6 +13,7 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       contents: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,7 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           cache: "npm"
-          node-version: "22"
+          node-version: 22
           registry-url: "https://registry.npmjs.org"
 
       - name: Get tag version
@@ -38,4 +36,6 @@ jobs:
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
+          branch: main
+          commit_author: Github Actions <actions@github.com>
           commit_message: "bump: Upgrade version to ${{ env.VERSION }}"
