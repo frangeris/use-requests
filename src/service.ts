@@ -65,7 +65,13 @@ export class Service<P> {
 
   private async response<T>(res: Response): Promise<ServiceResponse<T>> {
     const newRes = res.clone() as unknown as ServiceResponse<T>;
-    newRes.data = (await res.json()) as T;
+
+    if (res.ok) {
+      const body = await res.json();
+      if (body?.data) {
+        newRes.data = body.data as T;
+      }
+    }
 
     return newRes;
   }
