@@ -1,6 +1,6 @@
 {
   "name": "use-requests",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "author": "Frangeris Peguero <frangeris.20@gmail.com>",
   "license": "MIT",
   "main": "dist/index.js",
