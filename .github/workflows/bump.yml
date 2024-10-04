@@ -1,17 +1,21 @@
-name: publish
-run-name: Publish to NPM
+name: bump
+run-name: Bump package version
 
 on:
   push:
     tags:
       - "*"
+  workflow_run:
+    workflows: ["publish"]
+    types:
+      - completed
 
 jobs:
-  release:
-    name: Release
+  bump:
+    name: Bump
     runs-on: ubuntu-22.04
     permissions:
-      id-token: write
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,13 +36,10 @@ jobs:
       - name: Update package.json
         run: npm version ${{ env.VERSION }} --no-git-tag-version --allow-same-version
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build the package
-        run: npm run build
-
-      - name: Publish to npm
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Commit updated package.json
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add package.json
+          git commit -m "bump: Upgrade version to ${{ env.VERSION }}"
+          git push origin HEAD
