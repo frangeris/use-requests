@@ -34,16 +34,16 @@ export class Service<P> {
   }
 
   private build(path?: RequestPath<P>) {
-    if (!path) {
-      return "";
-    }
-
     if (typeof path === "string") {
       return path;
     }
 
-    // build complex path
     let url = this.resource;
+    if (!path) {
+      return url;
+    }
+
+    // build complex path
     const { params, query } = path;
     if (params) {
       for (const k in params) {
@@ -63,24 +63,27 @@ export class Service<P> {
     return url;
   }
 
-  private async response<T>(request: Response): ServiceResponse<T> {
-    return {
-      ...request,
-      data: (await request.json()) as T,
-    };
+  private async response<T>(res: Response): Promise<ServiceResponse<T>> {
+    const newRes = res.clone() as unknown as ServiceResponse<T>;
+    newRes.data = (await res.json()) as T;
+
+    return newRes;
   }
 
   // HTTP methods
-  async get<T>(path?: RequestPath<P>): ServiceResponse<T> {
-    const request = await this.request({
+  async get<T>(path?: RequestPath<P>) {
+    const response = await this.request({
       path,
       method: "get",
     });
 
-    return this.response<T>(request);
+    return this.response<T>(response);
   }
 
-  async post<T>(payload: any, path?: RequestPath<P>): ServiceResponse<T> {
+  async post<T>(
+    payload: any,
+    path?: RequestPath<P>
+  ): Promise<ServiceResponse<T>> {
     const request = await this.request({
       path,
       method: "post",
@@ -90,7 +93,10 @@ export class Service<P> {
     return this.response<T>(request);
   }
 
-  async put<T>(payload: any, path?: RequestPath<P>): ServiceResponse<T> {
+  async put<T>(
+    payload: any,
+    path?: RequestPath<P>
+  ): Promise<ServiceResponse<T>> {
     const request = await this.request({
       path,
       method: "put",
@@ -100,7 +106,7 @@ export class Service<P> {
     return this.response<T>(request);
   }
 
-  async delete<T>(path?: RequestPath<P>): ServiceResponse<T> {
+  async delete<T>(path?: RequestPath<P>): Promise<ServiceResponse<T>> {
     const request = await this.request({
       path,
       method: "delete",
@@ -112,7 +118,7 @@ export class Service<P> {
   async patch<T>(
     ops: PatchOperation[],
     path?: RequestPath<P>
-  ): ServiceResponse<T> {
+  ): Promise<ServiceResponse<T>> {
     const request = await this.request({
       path,
       method: "patch",
