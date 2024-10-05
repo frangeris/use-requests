@@ -22,7 +22,9 @@ export type ExtractParams<T> =
     ? { [k in Param | keyof ExtractParams<Rest>]: string | number }
     : T extends `${infer Start}:${infer Param}`
     ? { [k in Param]: string | number }
-    : never;
+    : T extends `${infer Start}/${infer Rest}`
+    ? ExtractParams<Rest>
+    : {};
 
 export type PatchOperation = {
   path: string;
