@@ -11,6 +11,7 @@ export type ServiceResponse<R> = { data: R } & Response;
 
 export type RequestPath<P> =
   | {
+      path?: string;
       params?: ExtractParams<P>;
       query?: Record<string, string | number>;
     }

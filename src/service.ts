@@ -44,7 +44,11 @@ export class Service<P> {
     }
 
     // build complex path
-    const { params, query } = path;
+    const { params, query, path: customPath } = path;
+    if (customPath) {
+      url += customPath;
+    }
+
     if (params) {
       for (const k in params) {
         // @ts-ignore
