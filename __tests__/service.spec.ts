@@ -42,6 +42,11 @@ describe("service", () => {
       expect(() => service["build"]({})).toThrow("Missing path parameters");
     });
 
+    it("should throw an error if multiple path parameters are missing", () => {
+      const service = new Service("/resource/:a/test/:b/test/:c");
+      expect(() => service["build"]({})).toThrow("Missing path parameters");
+    });
+
     it("should include query parameters", () => {
       const service = new Service("/resource");
       const path = { query: { search: "test" } };
