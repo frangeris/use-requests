@@ -90,7 +90,20 @@ init("https://api.example.io/dev", { ...Api });
 const main = async () => {
   const { userById, users } = useRequests<typeof Api>();
   const { data: usersRes } = await users.get<User[]>();
-  const { data: userByIdRes } = await userById.get<User>({ params: { id: 1 } });
+  const {
+    data: userByIdRes, // wrapper that cast to generic
+
+    // properties available from Response web API
+    json,
+    ok,
+    body,
+    blob,
+    bytes,
+    headers,
+    status,
+    text,
+    statusText,
+  } = await userById.get<User>({ params: { id: 1 } });
   // Optionally, set headers for the request
   // users.headers.set("Authorization", "Bearer token");
 };
