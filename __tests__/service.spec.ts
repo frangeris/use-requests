@@ -23,6 +23,12 @@ describe("service", () => {
       expect(service["build"]("/path")).toBe("/path");
     });
 
+    it("should include query parameters", () => {
+      const service = new Service("/resource");
+      const path = { path: "/another" };
+      expect(service["build"](path)).toBe("/resource/another");
+    });
+
     it("should replace parameters in resource", () => {
       const service = new Service<unknown>("/resource/:id");
       const path = { params: { id: "123" } };
