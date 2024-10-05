@@ -1,7 +1,7 @@
 {
   "name": "use-requests",
   "description": "Type-Safe HTTP client hook (react) to handle requests based on native fetch api with some magic under the hood ✨",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "author": "Frangeris Peguero <frangeris.20@gmail.com>",
   "license": "MIT",
   "main": "dist/index.js",
