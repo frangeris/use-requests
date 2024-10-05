@@ -114,6 +114,14 @@ The `data` property is a wrapper around the `Response.json()` method that looks 
 
 The test endpoint is accessed with an id parameter. You can also set headers (like authorization tokens) as needed.
 
+There is also an option available for customizing the path of the endpoint, adding another part to the URL, used for extends the endpoint, for example:
+
+```ts
+const { users } = useRequests<typeof Api>();
+await users.get({ path: "/test", query: { id: "1" } });
+// https://api.example.io/dev/users/test?id=1
+```
+
 ---
 
 ### Only registered endpoints are available
