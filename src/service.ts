@@ -45,10 +45,6 @@ export class Service<P> {
 
     // build complex path
     const { params, query, path: customPath } = path;
-    if (customPath) {
-      url += customPath;
-    }
-
     if (params) {
       for (const k in params) {
         // @ts-ignore
@@ -56,6 +52,10 @@ export class Service<P> {
       }
     } else if (url.includes(":")) {
       throw new Error("Missing path parameters");
+    }
+
+    if (customPath) {
+      url += customPath;
     }
 
     if (query) {
