@@ -1,13 +1,15 @@
-// @ts-nocheck
 import Options from "./options";
 import { ServiceResponse, RequestPath, PatchOperation } from "./types";
 
 export class Service<P> {
-  private resource: string;
+  private resource?: string;
   private controller: AbortController;
 
-  constructor(resource: string) {
-    this.resource = resource;
+  constructor(resource?: string) {
+    if (resource) {
+      this.resource = resource;
+    }
+
     this.controller = new AbortController();
   }
 
@@ -66,8 +68,7 @@ export class Service<P> {
 
   private async response<T>(res: Response): Promise<ServiceResponse<T>> {
     const newRes = res.clone() as Response as ServiceResponse<T>;
-    const contentLength = res.headers.get("content-length");
-    if (res.ok && contentLength) {
+    if (res.ok && newRes.body) {
       try {
         const body = await res.json();
         if (body?.data) {
