@@ -68,18 +68,13 @@ export class Service<P> {
 
   private async response<T>(res: Response): Promise<ServiceResponse<T>> {
     const newRes = res.clone() as Response as ServiceResponse<T>;
-    if (res.ok && newRes.body) {
+    newRes.data = async () => {
       try {
-        const body = await res.json();
-        if (body?.data) {
-          newRes.data = body.data as T;
-        } else {
-          newRes.data = null;
-        }
+        return (await res.json()) as T;
       } catch (error) {
-        console.log(error);
+        return null;
       }
-    }
+    };
 
     return newRes;
   }
