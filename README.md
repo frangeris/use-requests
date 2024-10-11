@@ -146,9 +146,28 @@ The response by any methods is an instance of [fetch Response](https://developer
 
 ### Headers
 
-You can set headers for a request by using the `headers` property on the method object. This property is an instance of [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) object, which you can use to set headers for the request.
+The `useOptions` function allows you to customize headers following the standard [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) API specification.
 
-All headers are shared across all requests, so you only need to set them once. For example, you can set an authorization token for all requests by calling `users.headers.set("Authorization")` and will be used for all subsequent requests.
+All headers are shared across all requests, so you only need to set them once. For example, you can set an authorization token for all requests and will be used for all subsequent requests, eg:
+
+To use `useOptions`, you first need to import it from the module:
+
+```ts
+import { useOptions } from "use-requests";
+
+const { headers } = useOptions();
+const { users } = useRequests<typeof Api>();
+headers.set("Authorization", "Bearer token");
+// ...
+const { data: usersRes } = await users.get<User[]>({}, options);
+```
+
+This sets the `Authorization` header for all requests made using the `useRequests` hook.
+
+> [!NOTE]
+> All request from now on will use this header while the instance is alive
+
+By using `useOptions`, you can easily customize headers and other request options (future) on a per-request basis, providing flexibility and control over your API interactions.
 
 ## Why `use-requests`?
 
