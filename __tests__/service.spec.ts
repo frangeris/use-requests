@@ -8,7 +8,7 @@ global.fetch = jest.fn(() => ({
 describe("service", () => {
   beforeEach(() => {
     Options.instance = jest.fn().mockReturnValue({
-      opts: { baseURL: "http://example.com" },
+      baseURL: "http://example.com",
     });
   });
 
@@ -65,8 +65,7 @@ describe("service", () => {
   describe("request", () => {
     it("should construct a Request object correctly", async () => {
       const service = new Service("/resource");
-      const opts = { method: "get", path: "/hello" };
-      await service["request"](opts);
+      await service["request"]({ method: "get", path: "/hello" });
       expect(global.fetch).toHaveBeenCalled();
     });
   });

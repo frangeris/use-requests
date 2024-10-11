@@ -3,7 +3,7 @@ import Options from "./options";
 import context from "./context";
 
 export function init(baseURL: string, endpoints: Record<string, string>) {
-  Options.instance().opts = { baseURL };
+  Options.instance().baseURL = baseURL;
   const requests = {};
   for (const key in endpoints) {
     Object.assign(requests, {

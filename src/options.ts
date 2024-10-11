@@ -2,7 +2,8 @@ import { InitOptions } from "./types";
 
 export class Options {
   static #instance: Options;
-  public opts?: InitOptions;
+  public baseURL?: string;
+  public headers: Headers = new Headers();
 
   public static instance(): Options {
     if (!Options.#instance) {

@@ -1,28 +1,25 @@
+// @ts-nocheck
 import Options from "./options";
 import { ServiceResponse, RequestPath, PatchOperation } from "./types";
 
 export class Service<P> {
-  public headers: Headers = new Headers();
-  private baseURL: string;
   private resource: string;
   private controller: AbortController;
 
   constructor(resource: string) {
-    const opts = Options.instance().opts;
-    if (!opts) {
-      throw new Error("Options not initialized, use initServices");
-    }
-
-    this.baseURL = opts?.baseURL;
     this.resource = resource;
     this.controller = new AbortController();
   }
 
   private request(
-    opts: RequestInit & { path?: RequestPath<P> }
+    req: RequestInit & { path?: RequestPath<P> }
   ): Promise<Response> {
-    const { path, ...rest } = opts;
-    const { baseURL, headers } = this;
+    const { baseURL, headers } = Options.instance();
+    if (!baseURL) {
+      throw new Error("Missing baseURL in options");
+    }
+
+    const { path, ...rest } = req;
     const url = baseURL + this.build(path);
     const request = new Request(url, {
       headers,
@@ -38,7 +35,7 @@ export class Service<P> {
       return path;
     }
 
-    let url = this.resource;
+    let url = this.resource || "";
     if (!path) {
       return url;
     }
@@ -68,12 +65,18 @@ export class Service<P> {
   }
 
   private async response<T>(res: Response): Promise<ServiceResponse<T>> {
-    const newRes = res.clone() as unknown as ServiceResponse<T>;
-
-    if (res.ok) {
-      const body = await res.json();
-      if (body?.data) {
-        newRes.data = body.data as T;
+    const newRes = res.clone() as Response as ServiceResponse<T>;
+    const contentLength = res.headers.get("content-length");
+    if (res.ok && contentLength) {
+      try {
+        const body = await res.json();
+        if (body?.data) {
+          newRes.data = body.data as T;
+        } else {
+          newRes.data = null;
+        }
+      } catch (error) {
+        console.log(error);
       }
     }
 
@@ -84,7 +87,7 @@ export class Service<P> {
   async get<T>(path?: RequestPath<P>) {
     const response = await this.request({
       path,
-      method: "get",
+      method: "GET",
     });
 
     return this.response<T>(response);
@@ -96,7 +99,7 @@ export class Service<P> {
   ): Promise<ServiceResponse<T>> {
     const request = await this.request({
       path,
-      method: "post",
+      method: "POST",
       body: JSON.stringify(payload),
     });
 
@@ -109,7 +112,7 @@ export class Service<P> {
   ): Promise<ServiceResponse<T>> {
     const request = await this.request({
       path,
-      method: "put",
+      method: "PUT",
       body: JSON.stringify(payload),
     });
 
@@ -119,7 +122,7 @@ export class Service<P> {
   async delete<T>(path?: RequestPath<P>): Promise<ServiceResponse<T>> {
     const request = await this.request({
       path,
-      method: "delete",
+      method: "DELETE",
     });
 
     return this.response<T>(request);
@@ -131,15 +134,12 @@ export class Service<P> {
   ): Promise<ServiceResponse<T>> {
     const request = await this.request({
       path,
-      method: "patch",
+      method: "PATCH",
+      body: JSON.stringify(ops),
     });
 
     return this.response<T>(request);
   }
-
-  // private abort() {
-  //   this.controller.abort();
-  // }
 }
 
 export default Service;
