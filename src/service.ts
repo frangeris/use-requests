@@ -70,7 +70,8 @@ export class Service<P> {
     const newRes = res.clone() as Response as ServiceResponse<T>;
     newRes.data = async () => {
       try {
-        return (await res.json()) as T;
+        const { data } = await res.json();
+        return data as T;
       } catch (error) {
         return null;
       }

@@ -86,7 +86,7 @@ describe("service", () => {
       );
 
       const data = await res.data();
-      expect(data).toEqual(dummy);
+      expect(data).toEqual(dummy.data);
     });
   });
 });

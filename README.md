@@ -19,8 +19,6 @@
 npm install use-requests
 ```
 
-abstracts
-
 ## Get started
 
 This module provides a lightweight abstraction for making API requests in TypeScript, with a focus on defining and using REST API endpoints efficiently. The module offers a clean, type-safe way to handle HTTP requests using predefined endpoints.
@@ -43,7 +41,7 @@ First, you’ll need to import the necessary functions.
 Here's how you import them from the module:
 
 ```ts
-import { useRequests, init } from "use-requests";
+import { init, useRequests, useOptions } from "use-requests";
 ```
 
 Then, you'll define your API endpoints using an [enum](https://www.typescriptlang.org/docs/handbook/enums.html). This `enum` acts as a centralized way to declare all the routes your API supports. It also helps ensure that requests are type-safe, meaning you'll get compile-time checks for correct usage:
@@ -76,7 +74,7 @@ By setting up this initialization, you ensure that every request you make using 
 Once the module is initialized, you can easily make requests to the defined endpoints. Here's a snippet for requests:
 
 ```ts
-import { useRequests, init } from "use-requests";
+import { init, useRequests, useOptions } from "use-requests";
 
 type User = {};
 
@@ -90,36 +88,20 @@ init("https://api.example.io/dev", { ...Api });
 const main = async () => {
   const { userById, users } = useRequests<typeof Api>();
   const { data: usersRes } = await users.get<User[]>();
-  const {
-    data: userByIdRes, // wrapper that cast to generic
-
-    // properties available from Response web API
-    json,
-    ok,
-    body,
-    blob,
-    bytes,
-    headers,
-    status,
-    text,
-    statusText,
-  } = await userById.get<User>({ params: { id: 1 } });
-  // Optionally, set headers for the request
-  // users.headers.set("Authorization", "Bearer token");
+  const { json, ok, body, blob, bytes, headers, status, text, statusText } =
+    await userById.get<User>({ params: { id: 1 } });
 };
 main();
 ```
 
-The `data` property is a wrapper around the `Response.json()` method that looks for `data` key in the response, in case that property exists, it will be returned as the representation of the response `body.data` casted to the generic type used, eg: `User[]` or `User`.
-
-The test endpoint is accessed with an id parameter. You can also set headers (like authorization tokens) as needed.
+The `data` method is also available, it's a wrapper around the `Response.json()` method that cast the response using the `data` property in the response, in case that property exists, it will be returned casted to the generic type used, eg: `User[]` or `User`.
 
 There is also an option available for customizing the path of the endpoint, adding another part to the URL, used for extends the endpoint, for example:
 
 ```ts
 const { users } = useRequests<typeof Api>();
 await users.get({ path: "/test", query: { id: "1" } });
-// https://api.example.io/dev/users/test?id=1
+// Will request to https://api.example.io/dev/users/test?id=1
 ```
 
 ---
@@ -159,7 +141,7 @@ const { headers } = useOptions();
 const { users } = useRequests<typeof Api>();
 headers.set("Authorization", "Bearer token");
 // ...
-const { data: usersRes } = await users.get<User[]>({}, options);
+const { data: usersRes } = await users.get<User[]>();
 ```
 
 This sets the `Authorization` header for all requests made using the `useRequests` hook.
