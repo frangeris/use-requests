@@ -69,4 +69,21 @@ describe("service", () => {
       expect(global.fetch).toHaveBeenCalled();
     });
   });
+
+  describe("response", () => {
+    it("should return data undefined when body is not present", async () => {
+      const service = new Service("/resource");
+      const res = await service["response"](new Response());
+      expect(res.data).toBeUndefined();
+    });
+
+    it("should return return object with data", async () => {
+      const dummy = { data: { key: "value" } };
+      const service = new Service("/resource");
+      const res = await service["response"](
+        new Response(JSON.stringify(dummy))
+      );
+      expect(res.data).toEqual(dummy.data);
+    });
+  });
 });
