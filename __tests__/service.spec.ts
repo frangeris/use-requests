@@ -74,7 +74,8 @@ describe("service", () => {
     it("should return data undefined when body is not present", async () => {
       const service = new Service("/resource");
       const res = await service["response"](new Response());
-      expect(res.data).toBeUndefined();
+      const data = await res.data();
+      expect(data).toBeNull();
     });
 
     it("should return return object with data", async () => {
@@ -83,7 +84,9 @@ describe("service", () => {
       const res = await service["response"](
         new Response(JSON.stringify(dummy))
       );
-      expect(res.data).toEqual(dummy.data);
+
+      const data = await res.data();
+      expect(data).toEqual(dummy);
     });
   });
 });
