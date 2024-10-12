@@ -12,5 +12,8 @@
     }
   },
   "exclude": ["node_modules", "jest.config.js"],
-  "typeRoots": ["./node_modules/@types"]
+  "typeRoots": ["./node_modules/@types"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
 }
