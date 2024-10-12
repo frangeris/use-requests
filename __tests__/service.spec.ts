@@ -1,10 +1,6 @@
 import Service from "@/service";
 import Options from "@/options";
 
-global.fetch = jest.fn(() => ({
-  json: () => Promise.resolve({ test: true }),
-})) as jest.Mock;
-
 describe("service", () => {
   beforeEach(() => {
     Options.instance = jest.fn().mockReturnValue({
