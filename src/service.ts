@@ -1,4 +1,4 @@
-import { RequestPath, PatchOperation, ServiceOptions } from "./types";
+import { RequestPath, ServiceOptions } from "./types";
 import Options from "./options";
 
 class ServiceResponse<T> extends Response {
@@ -15,7 +15,7 @@ class ServiceResponse<T> extends Response {
       if (response) {
         const { ok, body } = response;
         let data = null;
-        if (ok) {
+        if (ok && body) {
           const reader = body?.getReader();
           const decoder = new TextDecoder();
           let result = "";
@@ -25,10 +25,10 @@ class ServiceResponse<T> extends Response {
             result += decoder.decode(value, { stream: true });
           }
           reader?.releaseLock();
-          data = JSON.parse(result) as unknown;
+          data = JSON.parse(result) as { data: any };
         }
 
-        return data;
+        return data?.data ?? null;
       }
 
       return null;
@@ -50,13 +50,16 @@ export class Service<P> {
     this.controller = new AbortController();
   }
 
-  private buildPath(path?: RequestPath<P>) {
+  private buildUrl(path?: RequestPath<P>): string {
+    // when no resource, a raw request
+    let url = this.resource ?? "";
+
     // no need to build path
     if (typeof path === "string") {
-      return path;
+      return url + path;
     }
 
-    let url = this.resource || "";
+    // not path provided, plain url
     if (!path) {
       return url;
     }
@@ -84,95 +87,97 @@ export class Service<P> {
     return url;
   }
 
-  private buildRequest(
-    req: RequestInit & { path?: RequestPath<P> }
-  ): Promise<Response> {
+  private buildRequest(req: RequestInit & { path?: RequestPath<P> }): Request {
     let baseURL = "";
     const { headers } = Options.instance();
 
-    // not raw requests
+    // for normal requests (not raw), base url is required
     if (!this.options?.bypass) {
       const { baseURL: initialURL } = Options.instance();
       if (!initialURL) {
         throw new Error("Missing baseURL in options");
       }
-    } else {
-      baseURL = this.resource || "";
+      baseURL = initialURL;
     }
 
     const { path, ...rest } = req;
-    const url = this.options?.bypass
-      ? this.buildPath(path)
-      : baseURL + this.buildPath(path);
+    const url = baseURL + this.buildUrl(path);
     const request = new Request(url, {
       headers,
       signal: this.controller.signal,
       ...rest,
     });
 
-    return fetch(request);
+    return request;
   }
 
   private buildResponse<T>(res: Response): ServiceResponse<T> {
     return new ServiceResponse<T>(res);
   }
 
+  private makeRequest(req: Request): Promise<Response> {
+    return fetch(req);
+  }
+
   // HTTP methods
   async get<T>(path?: RequestPath<P>) {
-    const response = await this.buildRequest({
-      path,
-      method: "GET",
-    });
+    const req = this.buildRequest({ path, method: "GET" });
+    const res = await this.makeRequest(req);
 
-    return this.buildResponse<T>(response);
+    return this.buildResponse<T>(res);
   }
 
   async post<T>(
     payload: any,
     path?: RequestPath<P>
   ): Promise<ServiceResponse<T>> {
-    const request = await this.buildRequest({
+    const req = await this.buildRequest({
       path,
       method: "POST",
       body: JSON.stringify(payload),
     });
+    const res = await this.makeRequest(req);
 
-    return this.buildResponse<T>(request);
+    return this.buildResponse<T>(res);
   }
 
   async put<T>(
     payload: any,
     path?: RequestPath<P>
   ): Promise<ServiceResponse<T>> {
-    const request = await this.buildRequest({
+    const req = await this.buildRequest({
       path,
       method: "PUT",
       body: JSON.stringify(payload),
     });
+    const res = await this.makeRequest(req);
 
-    return this.buildResponse<T>(request);
+    return this.buildResponse<T>(res);
   }
 
   async delete<T>(path?: RequestPath<P>): Promise<ServiceResponse<T>> {
-    const request = await this.buildRequest({
-      path,
-      method: "DELETE",
-    });
+    const req = await this.buildRequest({ path, method: "DELETE" });
+    const res = await this.makeRequest(req);
 
-    return this.buildResponse<T>(request);
+    return this.buildResponse<T>(res);
   }
 
   async patch<T>(
-    ops: PatchOperation[],
+    ops: {
+      path: string;
+      op: "add" | "remove" | "replace" | "move" | "copy" | "test";
+      value?: any;
+    }[],
     path?: RequestPath<P>
   ): Promise<ServiceResponse<T>> {
-    const request = await this.buildRequest({
+    const req = await this.buildRequest({
       path,
       method: "PATCH",
       body: JSON.stringify(ops),
     });
+    const res = await this.makeRequest(req);
 
-    return this.buildResponse<T>(request);
+    return this.buildResponse<T>(res);
   }
 }
 
