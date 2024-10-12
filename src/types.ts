@@ -26,12 +26,6 @@ export type ExtractParams<T> =
     ? ExtractParams<Rest>
     : {};
 
-export type PatchOperation = {
-  path: string;
-  op: "add" | "remove" | "replace" | "move" | "copy" | "test";
-  value?: any;
-};
-
 export type ServiceOptions = {
   bypass?: boolean;
 };
