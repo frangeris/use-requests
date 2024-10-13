@@ -1,40 +1,5 @@
-import { RequestPath, ServiceOptions } from "./types";
+import { RequestPath, ServiceOptions, ServiceResponse } from "./types";
 import Options from "./options";
-
-class ServiceResponse<T> extends Response {
-  private response?: Response;
-
-  constructor(res: Response) {
-    super(res.body, res);
-    this.response = res;
-  }
-
-  public get data() {
-    return (async () => {
-      const response = this.response;
-      if (response) {
-        const { ok, body } = response;
-        let data = null;
-        if (ok && body) {
-          const reader = body?.getReader();
-          const decoder = new TextDecoder();
-          let result = "";
-          while (true) {
-            const { value, done } = await reader!.read();
-            if (done) break;
-            result += decoder.decode(value, { stream: true });
-          }
-          reader?.releaseLock();
-          data = JSON.parse(result) as { data: any };
-        }
-
-        return data?.data ?? null;
-      }
-
-      return null;
-    })();
-  }
-}
 
 export class Service<P> {
   private resource?: string;
@@ -111,8 +76,25 @@ export class Service<P> {
     return request;
   }
 
-  private buildResponse<T>(res: Response): ServiceResponse<T> {
-    return new ServiceResponse<T>(res);
+  private buildResponse<T>(res: Response) {
+    // gets populated only when acceded
+    Object.defineProperty(res, "data", {
+      get() {
+        return (async () => {
+          try {
+            const data = (await res.json()) as { data: T };
+            return data?.data ?? null;
+          } catch (err) {
+            console.error(err);
+            return null;
+          }
+        })();
+      },
+      enumerable: true,
+      configurable: false,
+    });
+
+    return res as ServiceResponse<T>;
   }
 
   private makeRequest(req: Request): Promise<Response> {
