@@ -2,7 +2,9 @@ import { useRawRequest } from "@/index";
 import Service from "@/service";
 
 global.fetch = jest.fn(() => ({
-  json: () => Promise.resolve({}),
+  status: 200,
+  json: () => Promise.resolve(),
+  data: {},
 })) as jest.Mock;
 
 describe("useRawRequest", () => {

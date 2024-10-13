@@ -7,7 +7,7 @@ export type InitOptions = {
 
 export type Services<T> = { [K in keyof T]: Service<T[K]> };
 
-export type ServiceResponse<R> = { data: R | null } & Response;
+export type ServiceResponse<R> = Response & { data: R | null };
 
 export type RequestPath<P> =
   | {

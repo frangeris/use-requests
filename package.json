@@ -10,7 +10,8 @@
   "scripts": {
     "test": "jest",
     "build": "tsup src/index.ts --format cjs,esm --minify --dts --clean",
-    "lint": "tsc"
+    "lint": "tsc",
+    "examples": "ts-node examples/index.ts"
   },
   "repository": {
     "type": "git",
