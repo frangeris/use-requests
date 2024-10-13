@@ -85,7 +85,6 @@ export class Service<P> {
             const data = (await res.json()) as { data: T };
             return data?.data ?? null;
           } catch (err) {
-            console.error(err);
             return null;
           }
         })();
