@@ -10,8 +10,8 @@ enum Api {
 }
 init("https://jsonplaceholder.typicode.com", { ...Api });
 
-const normal = async () => {
-  console.info("✨ Normal requests");
+const typed = async () => {
+  console.info("✨ Typed requests");
   const { posts, comments } = useRequests<typeof Api>();
 
   let t = await posts.get();
@@ -50,7 +50,8 @@ const raw = async () => {
   console.log(t.status, "GET /posts");
 
   // parameters in url are also supported and can be passed as an object too
-  // but is doesnt throw an error if the parameter is not passed
+  // but it doesn't throw an error if the parameter is not passed, so params
+  // are not required
   t = await r.get({
     path: "/posts/:id",
     params: { id: 1 },
@@ -60,6 +61,6 @@ const raw = async () => {
 
 // run all examples sequentially
 (async () => {
-  await normal();
+  await typed();
   await raw();
 })();
