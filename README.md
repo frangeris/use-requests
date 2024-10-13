@@ -144,7 +144,7 @@ The `data` property is a helper that allows you to extract the JSON response fro
 1. The property is not populated automatically, you need to call it explicitly in a asynchronous way.
 2. `data` key needs to be present on the response, otherwise, it will return `null`,
 
-Here's an example of how to use the `data` property:
+Here's an example of how to use the `data` property, given the following JSON response for `GET /users`:
 
 ```json
 {
