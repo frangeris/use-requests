@@ -147,7 +147,6 @@ The `data` property is a helper that allows you to extract the JSON response fro
 Here's an example of how to use the `data` property:
 
 ```json
-// GET /users
 {
   "data": [
     {
