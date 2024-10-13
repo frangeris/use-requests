@@ -1,6 +1,6 @@
 {
   "name": "use-requests",
-  "description": "Type-Safe HTTP client hook (react) to handle requests based on native fetch api with some magic under the hood ✨",
+  "description": "Type-Safe HTTP client hook helper to handle requests based on native fetch api with some magic under the hood ✨",
   "version": "1.0.15",
   "author": "Frangeris Peguero <frangeris.20@gmail.com>",
   "license": "MIT",
@@ -24,6 +24,7 @@
     "@types/jest": "29.5.13",
     "jest": "29.7.0",
     "ts-jest": "29.2.5",
+    "tsconfig-paths": "4.2.0",
     "tsup": "8.3.0",
     "typescript": "5.6.2"
   }

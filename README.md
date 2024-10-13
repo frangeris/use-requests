@@ -10,6 +10,10 @@
 
 **Support questions should be asked [here](https://github.com/frangeris/use-requests/discussions).**
 
+> Type-Safe HTTP client hook helper to handle requests based on native fetch api with some magic under the hood ✨.
+
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/frangeris/use-requests/build.yml)
+
 ## Install
 
 > [!CAUTION]
@@ -31,17 +35,17 @@ Some key features:
 
 ## Usage
 
-To begin using the API request module, you need to initialize it by specifying the base URL of your API and defining the endpoints you'll be working with. This setup ensures that all subsequent API requests are made to the correct URLs with consistent endpoint handling.
+To begin using the API request module, you need to initialize it by specifying the base URL of your API and defining the endpoints you'll be working with (there is an option for `raw` request we will cover later). This setup ensures that all subsequent API requests are made to the correct URLs with consistent endpoint handling.
 
 First, you’ll need to import the necessary functions.
 
 - The `useRequests` function is the core hook for making requests.
-- While `init` sets up the configuration for your API requests and can be called from anywhere in your app.
+- While `init` setup the configuration for your API requests and can be called from anywhere in your app.
 
 Here's how you import them from the module:
 
 ```ts
-import { init, useRequests, useOptions } from "use-requests";
+import { init, useRequests, useOptions, useRawRequests } from "use-requests";
 ```
 
 Then, you'll define your API endpoints using an [enum](https://www.typescriptlang.org/docs/handbook/enums.html). This `enum` acts as a centralized way to declare all the routes your API supports. It also helps ensure that requests are type-safe, meaning you'll get compile-time checks for correct usage:
@@ -55,23 +59,25 @@ export enum Api {
 
 Each key in the enum represents a different API route. These routes can contain dynamic parameters (e.g., `:id`), which are replaced by actual values when making requests.
 
-Now, we need to initialize the by using the `init` function. This function requires two arguments:
+Now, we need to initialize by using the `init` function. This function requires two arguments:
 
-- **Base URL**: The root URL where your API is hosted (e.g., https://api.example.io/dev).
+- **Base URL**: The root URL where your API is hosted (`e.g. https://api.example.io/dev`).
 - **Endpoints**: The enum you defined earlier, which specifies your available API routes.
 
 ```ts
 init("https://api.example.io/dev", { ...Api });
 ```
 
+In above example:
+
 - `https://api.example.io/dev` is the base URL of the API.
-- The spread operator `{ ...Endpoints }` ensures that all the endpoints defined in the `Endpoints` enum are passed to the initialization function.
+- The spread operator `{ ...Api }` ensures that all the endpoints defined in the `Api` enum are passed to the initialization function.
 
 By setting up this initialization, you ensure that every request you make using the `useRequests` hook will automatically target the correct API with the predefined endpoints.
 
 ### ⚡️ Now, let's make some requests
 
-Once the module is initialized, you can easily make requests to the defined endpoints. Here's a snippet for requests:
+Once the module is initialized, you can easily make requests to the defined endpoints. Here's quick snippet:
 
 ```ts
 import { init, useRequests, useOptions } from "use-requests";
@@ -86,47 +92,96 @@ export enum Api {
 init("https://api.example.io/dev", { ...Api });
 
 const main = async () => {
-  const { userById, users } = useRequests<typeof Api>();
-  const { data: usersRes } = await users.get<User[]>();
-  const { json, ok, body, blob, bytes, headers, status, text, statusText } =
-    await userById.get<User>({ params: { id: 1 } });
+  const { userById } = useRequests<typeof Api>();
+
+  // the returned structure is the same as the fetch Response object
+  // so json, ok, body, blob, bytes, headers, status, text, statusText are available
+  const t = await userById.get<User>({ params: { id: 1 } });
 };
 main();
 ```
 
-The `data` method is also available, it's a wrapper around the `Response.json()` method that cast the response using the `data` property in the response, in case that property exists, it will be returned casted to the generic type used, eg: `User[]` or `User`.
+> [!NOTE]
+> The `data` property is also available, but there are some caveats we will discuss later.
 
-There is also an option available for customizing the path of the endpoint, adding another part to the URL, used for extends the endpoint, for example:
+All HTTP methods expect an optional `RequestPath` object, which can be used to customize the request path, query strings, and other options. For example:
+
+Adding another part to the URL, used for extends the endpoint:
 
 ```ts
 const { users } = useRequests<typeof Api>();
 await users.get({ path: "/test", query: { id: "1" } });
-// Will request to https://api.example.io/dev/users/test?id=1
+// will request to https://api.example.io/dev/users/test?id=1
 ```
 
 ---
 
+Based on the above example, the `useRequests` hook returns an object with methods for each endpoint defined in the `Api` enum. You can then call these methods to make requests to the corresponding API routes.
+
 ### Only registered endpoints are available
 
-<img width="598" src="assets/examples/1.png" alt="example 1">
+If you try to access an endpoint that isn't defined in the `Api` enum, TypeScript will throw a compile-time error. This ensures that you only use the correct endpoints and helps prevent runtime errors.
 
-Based on the above example, the `useRequests` hook returns an object with methods for each endpoint defined in the `Api` enum. You can then call these methods to make requests to the corresponding API routes.
+<img width="682" src="assets/examples/1.gif" alt="example 1">
 
 ### Type-safe request handling
 
-<img width="741" src="assets/examples/2.png" alt="example 2">
+The `useRequests` hook provides methods for each endpoint defined in the `Api` enum. These methods are type-safe, meaning that the parameters you pass to them are checked against the expected types defined in the `Api` enum. This ensures that you're using the correct parameters for each endpoint and helps prevent runtime errors.
 
-Each method returned by `useRequests` is type-safe, meaning that the parameters you pass to the method are checked against the expected types defined in `Api` at compile time. This ensures that you're using the correct parameters for each endpoint and helps prevent runtime errors.
+<img width="928" src="assets/examples/2.gif" alt="example 2">
 
-> [!TIP]
-> Only dynamic path parameters `:param` and query strings are currently supported. Support for request bodies will be added in future versions.
-
-The response by any methods is an instance of [fetch Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object, which you can use to extract the data, status, headers, etc.
+The response by any methods is an instance of [fetch Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object, which you can use to extract `status, headers, json(), text()`, etc.
 
 > [!WARNING]
 > Any parameters defined in the endpoint definition are required when calling the method. If you omit a required parameter, TypeScript will throw a compile-time error or an exception will be thrown at runtime.
 
+### `data` property
+
+The `data` property is a helper that allows you to extract the JSON response from the fetch response object, it's a wrapper that _in case that **data** property exists_ in the `json` response so will be casted to the generic type used, eg: `User[]` or `User`.
+
+#### Caveats
+
+1. The property is not populated automatically, you need to call it explicitly in a asynchronous way.
+2. `data` key needs to be present on the response, otherwise, it will return `null`,
+
+Here's an example of how to use the `data` property, given the following JSON response for `GET /users`:
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "John Doe"
+    }
+  ]
+}
+```
+
+```ts
+const { users } = useRequests<typeof Api>();
+const { data } = await users.get<User[]>();
+console.log(await data); // [{ id: 1, name: "John Doe" }]
+```
+
+The `await` keyword is used to extract the JSON response from the fetch response object and cast it to the generic type `User[]` in runtime, so it will be available only when requested, otherwise and others scenarios when needs the direct manipulation of the response object, you can use the fetch response object directly.
+
+### Raw requests
+
+In some cases, you may need to make requests that don't correspond to any of the predefined endpoints. For these cases, you can use the `useRawRequests` hook, which provides a way to make raw requests to any URL.
+
+The `useRawRequests` hook returns an object with methods for making requests using the `fetch` API. You can use these methods to make requests to any URL, with full control over the request path, query strings, headers, and other options.
+
+When using raw requests, global shared options are not applied, here's an example of how to use the `useRawRequests` hook:
+
+```ts
+const raw = useRawRequests();
+const r = await raw("https://myapi.io").get();
+// GET https://myapi.io
+```
+
 ### Headers
+
+There is a way to customize headers for all requests, you can use the `useOptions` hook to set headers, options, and other configurations for all requests.
 
 The `useOptions` function allows you to customize headers following the standard [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) API specification.
 
@@ -141,7 +196,7 @@ const { headers } = useOptions();
 const { users } = useRequests<typeof Api>();
 headers.set("Authorization", "Bearer token");
 // ...
-const { data: usersRes } = await users.get<User[]>();
+const t = await users.get<User[]>();
 ```
 
 This sets the `Authorization` header for all requests made using the `useRequests` hook.

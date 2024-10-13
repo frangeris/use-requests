@@ -7,7 +7,7 @@ export type InitOptions = {
 
 export type Services<T> = { [K in keyof T]: Service<T[K]> };
 
-export type ServiceResponse<R> = { data: () => Promise<R | null> } & Response;
+export type ServiceResponse<R> = { data: R | null } & Response;
 
 export type RequestPath<P> =
   | {
@@ -26,8 +26,6 @@ export type ExtractParams<T> =
     ? ExtractParams<Rest>
     : {};
 
-export type PatchOperation = {
-  path: string;
-  op: "add" | "remove" | "replace" | "move" | "copy" | "test";
-  value?: any;
+export type ServiceOptions = {
+  bypass?: boolean;
 };

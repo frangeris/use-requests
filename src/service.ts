@@ -1,60 +1,81 @@
+import { RequestPath, ServiceOptions } from "./types";
 import Options from "./options";
-import { ServiceResponse, RequestPath, PatchOperation } from "./types";
+
+class ServiceResponse<T> extends Response {
+  private response?: Response;
+
+  constructor(res: Response) {
+    super(res.body, res);
+    this.response = res;
+  }
+
+  public get data() {
+    return (async () => {
+      const response = this.response;
+      if (response) {
+        const { ok, body } = response;
+        let data = null;
+        if (ok && body) {
+          const reader = body?.getReader();
+          const decoder = new TextDecoder();
+          let result = "";
+          while (true) {
+            const { value, done } = await reader!.read();
+            if (done) break;
+            result += decoder.decode(value, { stream: true });
+          }
+          reader?.releaseLock();
+          data = JSON.parse(result) as { data: any };
+        }
+
+        return data?.data ?? null;
+      }
+
+      return null;
+    })();
+  }
+}
 
 export class Service<P> {
   private resource?: string;
   private controller: AbortController;
+  private options?: ServiceOptions;
 
-  constructor(resource?: string) {
+  constructor(resource?: string, options: ServiceOptions = { bypass: false }) {
     if (resource) {
       this.resource = resource;
     }
 
+    this.options = options;
     this.controller = new AbortController();
   }
 
-  private request(
-    req: RequestInit & { path?: RequestPath<P> }
-  ): Promise<Response> {
-    const { baseURL, headers } = Options.instance();
-    if (!baseURL) {
-      throw new Error("Missing baseURL in options");
-    }
+  private buildUrl(path?: RequestPath<P>): string {
+    // when no resource, a raw request
+    let url = this.resource ?? "";
 
-    const { path, ...rest } = req;
-    const url = baseURL + this.build(path);
-    const request = new Request(url, {
-      headers,
-      signal: this.controller.signal,
-      ...rest,
-    });
-
-    return fetch(request);
-  }
-
-  private build(path?: RequestPath<P>) {
+    // no need to build path
     if (typeof path === "string") {
-      return path;
+      return url + path;
     }
 
-    let url = this.resource || "";
+    // not path provided, plain url
     if (!path) {
       return url;
     }
 
     // build complex path
     const { params, query, path: customPath } = path;
+    if (customPath) {
+      url += customPath;
+    }
+
     if (params) {
       for (const k in params) {
-        // @ts-ignore
         url = url.replace(`:${k}`, `${params[k]}`);
       }
     } else if (url.includes(":")) {
       throw new Error("Missing path parameters");
-    }
-
-    if (customPath) {
-      url += customPath;
     }
 
     if (query) {
@@ -66,76 +87,97 @@ export class Service<P> {
     return url;
   }
 
-  private async response<T>(res: Response): Promise<ServiceResponse<T>> {
-    const newRes = res.clone() as Response as ServiceResponse<T>;
-    newRes.data = async () => {
-      try {
-        const { data } = await res.json();
-        return data as T;
-      } catch (error) {
-        return null;
-      }
-    };
+  private buildRequest(req: RequestInit & { path?: RequestPath<P> }): Request {
+    let baseURL = "";
+    const { headers } = Options.instance();
 
-    return newRes;
+    // for normal requests (not raw), base url is required
+    if (!this.options?.bypass) {
+      const { baseURL: initialURL } = Options.instance();
+      if (!initialURL) {
+        throw new Error("Missing baseURL in options");
+      }
+      baseURL = initialURL;
+    }
+
+    const { path, ...rest } = req;
+    const url = baseURL + this.buildUrl(path);
+    const request = new Request(url, {
+      headers,
+      signal: this.controller.signal,
+      ...rest,
+    });
+
+    return request;
+  }
+
+  private buildResponse<T>(res: Response): ServiceResponse<T> {
+    return new ServiceResponse<T>(res);
+  }
+
+  private makeRequest(req: Request): Promise<Response> {
+    return fetch(req);
   }
 
   // HTTP methods
   async get<T>(path?: RequestPath<P>) {
-    const response = await this.request({
-      path,
-      method: "GET",
-    });
+    const req = this.buildRequest({ path, method: "GET" });
+    const res = await this.makeRequest(req);
 
-    return this.response<T>(response);
+    return this.buildResponse<T>(res);
   }
 
   async post<T>(
     payload: any,
     path?: RequestPath<P>
   ): Promise<ServiceResponse<T>> {
-    const request = await this.request({
+    const req = await this.buildRequest({
       path,
       method: "POST",
       body: JSON.stringify(payload),
     });
+    const res = await this.makeRequest(req);
 
-    return this.response<T>(request);
+    return this.buildResponse<T>(res);
   }
 
   async put<T>(
     payload: any,
     path?: RequestPath<P>
   ): Promise<ServiceResponse<T>> {
-    const request = await this.request({
+    const req = await this.buildRequest({
       path,
       method: "PUT",
       body: JSON.stringify(payload),
     });
+    const res = await this.makeRequest(req);
 
-    return this.response<T>(request);
+    return this.buildResponse<T>(res);
   }
 
   async delete<T>(path?: RequestPath<P>): Promise<ServiceResponse<T>> {
-    const request = await this.request({
-      path,
-      method: "DELETE",
-    });
+    const req = await this.buildRequest({ path, method: "DELETE" });
+    const res = await this.makeRequest(req);
 
-    return this.response<T>(request);
+    return this.buildResponse<T>(res);
   }
 
   async patch<T>(
-    ops: PatchOperation[],
+    ops: {
+      path: string;
+      op: "add" | "remove" | "replace" | "move" | "copy" | "test";
+      value?: any;
+    }[],
     path?: RequestPath<P>
   ): Promise<ServiceResponse<T>> {
-    const request = await this.request({
+    const req = await this.buildRequest({
       path,
       method: "PATCH",
       body: JSON.stringify(ops),
     });
+    const res = await this.makeRequest(req);
 
-    return this.response<T>(request);
+    return this.buildResponse<T>(res);
   }
 }
 

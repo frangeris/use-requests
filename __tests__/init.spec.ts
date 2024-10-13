@@ -1,56 +1,39 @@
 import { init } from "@/init";
-import { useRequest } from "@/useRequests";
-import { Service } from "@/service";
 import { Options } from "@/options";
+import Service from "@/service";
+import useRequest from "@/useRequests";
 
-// jest.mock("./service");
-// jest.mock("./options");
+enum Test {
+  endpoint1 = "/endpoint1",
+  endpoint2 = "/endpoint2",
+  endpoint3 = "/endpoint3",
+}
 
 describe("init", () => {
+  const baseURL = "http://api.example.io";
   beforeEach(() => {
     jest.clearAllMocks();
-    // delete globalThis.services;
+    init(baseURL, { ...Test });
   });
 
-  it("should initialize options correctly", () => {
-    // const mockInstance = { opts: {} };
-    // (Options.instance as jest.Mock).mockReturnValue(mockInstance);
-    const base = "http://myapi.io/test";
-    enum endpoints {
-      endpoint1 = "/endpoint1",
-    }
-    init(base, { ...endpoints });
-    // expect(Options.instance).toHaveBeenCalled();
-    // expect(mockInstance.opts).toEqual({ base });
+  it("should set the baseURL correctly", () => {
+    expect(Options.instance().baseURL).toBe(baseURL);
   });
 
-  // it("should create services correctly", () => {
-  //   const base = "http://example.com";
-  //   const endpoints = { endpoint1: "/api/endpoint1" };
+  it("should create services correctly", () => {
+    const ctx = useRequest<typeof Test>();
+    expect(ctx.endpoint1).toBeDefined();
+    expect(ctx.endpoint1).toBeInstanceOf(Service);
 
-  //   init(base, endpoints);
+    expect(ctx.endpoint2).toBeDefined();
+    expect(ctx.endpoint2).toBeInstanceOf(Service);
 
-  //   expect(Service).toHaveBeenCalledWith("/api/endpoint1");
-  // });
+    expect(ctx.endpoint3).toBeDefined();
+    expect(ctx.endpoint3).toBeInstanceOf(Service);
+  });
 
-  // it("should define globalThis.services correctly", () => {
-  //   const base = "http://example.com";
-  //   const endpoints = { endpoint1: "/api/endpoint1" };
-
-  //   init(base, endpoints);
-
-  //   expect(globalThis.services).toBeDefined();
-  //   expect(globalThis.services.endpoint1).toBeInstanceOf(Service);
-  // });
-
-  // it("should not redefine globalThis.services if already defined", () => {
-  //   globalThis.services = { existingService: "existing" };
-
-  //   const base = "http://example.com";
-  //   const endpoints = { endpoint1: "/api/endpoint1" };
-
-  //   init(base, endpoints);
-
-  //   expect(globalThis.services).toEqual({ existingService: "existing" });
-  // });
+  it("should define globalThis.useRequests correctly", () => {
+    // @ts-ignore
+    expect(globalThis.useRequests).toBeDefined();
+  });
 });
