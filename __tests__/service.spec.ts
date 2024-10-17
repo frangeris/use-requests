@@ -63,6 +63,12 @@ describe("service", () => {
       });
       expect(url).toBe("/resource/123?search=test");
     });
+
+    it("should escape path parameters", () => {
+      const service = new Service(`/resource\:top`);
+      const url = service["buildUrl"]();
+      expect(url).toBe("/resource:top");
+    });
   });
 
   describe("buildRequest", () => {
