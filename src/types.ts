@@ -26,6 +26,11 @@ export type ExtractParams<T> =
     ? ExtractParams<Rest>
     : {};
 
-export type ServiceOptions = {
+export type ServiceConfig = {
   bypass?: boolean;
+};
+
+export type InitConfig = {
+  endpoints: Record<string, string>;
+  options?: RequestInit;
 };
