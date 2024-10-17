@@ -1,17 +1,17 @@
-import { RequestPath, ServiceOptions, ServiceResponse } from "./types";
+import { RequestPath, ServiceConfig, ServiceResponse } from "./types";
 import Options from "./options";
 
 export class Service<P> {
   private resource?: string;
   private controller: AbortController;
-  private options?: ServiceOptions;
+  private config?: ServiceConfig;
 
-  constructor(resource?: string, options: ServiceOptions = { bypass: false }) {
+  constructor(resource?: string, config: ServiceConfig = { bypass: false }) {
     if (resource) {
       this.resource = resource;
     }
 
-    this.options = options;
+    this.config = config;
     this.controller = new AbortController();
   }
 
@@ -64,7 +64,7 @@ export class Service<P> {
     const { headers } = Options.instance();
 
     // for normal requests (not raw), base url is required
-    if (!this.options?.bypass) {
+    if (!this.config?.bypass) {
       const { baseURL: initialURL } = Options.instance();
       if (!initialURL) {
         throw new Error("Missing baseURL in options");
@@ -104,7 +104,9 @@ export class Service<P> {
   }
 
   private makeRequest(req: Request): Promise<Response> {
-    return fetch(req);
+    const { fetchOptions: opts } = Options.instance();
+
+    return fetch(req, opts);
   }
 
   // HTTP methods
