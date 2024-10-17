@@ -16,6 +16,8 @@ export class Service<P> {
   }
 
   private buildUrl(path?: RequestPath<P>): string {
+    const ESCAPED_COLON = "__ESCAPED_COLON__";
+
     // when no resource, a raw request
     let url = this.resource ?? "";
 
@@ -35,12 +37,16 @@ export class Service<P> {
       url += customPath;
     }
 
-    if (params) {
-      for (const k in params) {
-        url = url.replace(`:${k}`, `${params[k]}`);
-      }
-    } else if (url.includes(":")) {
-      throw new Error("Missing path parameters");
+    // replace path parameters
+    url = url.replace(/\\:/g, ESCAPED_COLON);
+    const toReplace = params as { [k: string]: string | number };
+    for (const k in toReplace) {
+      url = url.replace(`:${k}`, toReplace[k].toString());
+    }
+
+    // still missing parameters not replaced
+    if (/:(\w+)/.test(url)) {
+      throw Error(`Missing path parameters`);
     }
 
     if (query) {
@@ -49,7 +55,8 @@ export class Service<P> {
       url += `?${qs.toString()}`;
     }
 
-    return url;
+    // remove escaped
+    return url.replace(ESCAPED_COLON, ":");
   }
 
   private buildRequest(req: RequestInit & { path?: RequestPath<P> }): Request {

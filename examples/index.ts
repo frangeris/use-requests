@@ -57,6 +57,12 @@ const raw = async () => {
     params: { id: 1 },
   });
   console.log(t.status, "GET /posts/1");
+
+  t = await r.get({
+    path: `/posts/:id\\:top`,
+    params: { id: 1 },
+  });
+  console.log(t.status, "GET /posts/1:top");
 };
 
 // run all examples sequentially
