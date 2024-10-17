@@ -75,6 +75,19 @@ In above example:
 
 By setting up this initialization, you ensure that every request you make using the `useRequests` hook will automatically target the correct API with the predefined endpoints.
 
+### Escape path parameters
+
+In the `Api` enum, you can define dynamic path parameters by prefixing them with a colon (`:`). For example, the `userById` endpoint has a dynamic `:id` parameter, which can be replaced with an actual value when making requests.
+
+But what if you need to use a literal colon in your path, such as `/users:top`? You can escape the colon by _escaping it_ with a double backslash `\\`, like this:
+
+```ts
+topMessagesByUser = `/users/:id/messages\\:top`,
+// will hit /users/1/messages:top
+```
+
+This way, the colon will be treated as a literal character in the path, rather than a dynamic parameter.
+
 ### ⚡️ Now, let's make some requests
 
 Once the module is initialized, you can easily make requests to the defined endpoints. Here's quick snippet:
