@@ -13,7 +13,7 @@ describe("init", () => {
   const baseURL = "http://api.example.io";
   beforeEach(() => {
     jest.clearAllMocks();
-    init(baseURL, { ...Test });
+    init(baseURL, { endpoints: Test });
   });
 
   it("should set the baseURL correctly", () => {

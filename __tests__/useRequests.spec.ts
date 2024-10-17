@@ -22,7 +22,7 @@ describe("useRequests: without init", () => {
 
 describe("useRequests", () => {
   beforeEach(() => {
-    init("http://api.example.io", { ...Api });
+    init("http://api.example.io", { endpoints: Api });
   });
 
   it("should return the context.useRequests object", () => {
