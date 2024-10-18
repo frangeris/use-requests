@@ -5,8 +5,7 @@ import context from "./context";
 
 export function init(baseURL: string, config: InitConfig) {
   const { endpoints } = config;
-  Options.instance().baseURL = baseURL;
-  Options.instance().fetchOptions = config.options || {};
+  Options.instance(config.options).baseURL = baseURL;
 
   const requests = {};
   for (const key in endpoints) {
