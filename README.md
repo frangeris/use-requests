@@ -65,15 +65,30 @@ Now, we need to initialize by using the `init` function. This function requires 
 - **Endpoints**: The enum you defined earlier, which specifies your available API routes.
 
 ```ts
-init("https://api.example.io/dev", { ...Api });
+init("https://api.example.io/dev", { endpoints: Api });
 ```
 
 In above example:
 
 - `https://api.example.io/dev` is the base URL of the API.
-- The spread operator `{ ...Api }` ensures that all the endpoints defined in the `Api` enum are passed to the initialization function.
+- Passing the enum as value for `endpoints` config option ensures that all the endpoints defined in the `Api` enum are passed to the initialization function.
 
 By setting up this initialization, you ensure that every request you make using the `useRequests` hook will automatically target the correct API with the predefined endpoints.
+
+The [fetch options](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch#options) to customize the request are also supported via the second argument of the `init` function, eg:
+
+```ts
+init("https://api.example.io/dev", {
+  endpoints: Api,
+  options: {
+    cache: "no-store",
+    credentials: "include",
+    keepalive: true,
+    // ...
+  }
+```
+
+Other available global options can be set via the `useOptions` hook, we will cover this later.
 
 ### Escape path parameters
 
@@ -102,7 +117,7 @@ export enum Api {
   userById = "/users/:id",
 }
 
-init("https://api.example.io/dev", { ...Api });
+init("https://api.example.io/dev", { endpoints: Api });
 
 const main = async () => {
   const { userById } = useRequests<typeof Api>();
@@ -196,7 +211,7 @@ const r = await raw("https://myapi.io").get();
 
 There is a way to customize headers for all requests, you can use the `useOptions` hook to set headers, options, and other configurations for all requests.
 
-The `useOptions` function allows you to customize headers following the standard [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) API specification.
+The `useOptions` function allows you to customize options, including headers following the standard [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) API specification.
 
 All headers are shared across all requests, so you only need to set them once. For example, you can set an authorization token for all requests and will be used for all subsequent requests, eg:
 

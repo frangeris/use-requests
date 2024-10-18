@@ -1,5 +1,4 @@
 import useOptions from "@/useOptions";
-import Options from "@/options";
 
 describe("useOptions", () => {
   it("should return a singleton instance", () => {
