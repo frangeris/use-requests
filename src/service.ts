@@ -104,7 +104,7 @@ export class Service<P> {
   }
 
   private makeRequest(req: Request): Promise<Response> {
-    const { fetchOptions: opts } = Options.instance();
+    const opts = Options.instance() as RequestInit;
 
     return fetch(req, opts);
   }
