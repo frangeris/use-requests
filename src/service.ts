@@ -52,7 +52,7 @@ export class Service<P> {
     if (query) {
       const params = Object.entries(query).map(([k, v]) => [k, v.toString()]);
       const qs = new URLSearchParams(params);
-      url += `?${qs.toString()}`;
+      url += `?${decodeURIComponent(qs.toString())}`;
     }
 
     // remove escaped
