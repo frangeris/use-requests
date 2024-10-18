@@ -8,7 +8,10 @@ enum Api {
   posts = "/posts",
   comments = "/comments",
 }
-init("https://jsonplaceholder.typicode.com", { ...Api });
+init("https://jsonplaceholder.typicode.com", {
+  endpoints: Api,
+  options: { cache: "no-store" },
+});
 
 const typed = async () => {
   console.info("✨ Typed requests");
