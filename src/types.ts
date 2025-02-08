@@ -1,4 +1,4 @@
-import { Service } from "./service";
+import { Service } from "@/core/service";
 
 export type InitOptions = {
   baseURL: string;
@@ -7,7 +7,7 @@ export type InitOptions = {
 
 export type Services<T> = { [K in keyof T]: Service<T[K]> };
 
-export type ServiceResponse<R> = Response & { data: R | null };
+export type ServiceResponse<R> = (Response & { data: R | null }) | null;
 
 export type RequestPath<P> =
   | {
@@ -26,11 +26,23 @@ export type ExtractParams<T> =
     ? ExtractParams<Rest>
     : {};
 
-export type ServiceConfig = {
-  bypass?: boolean;
+export type ServiceMap = Record<string, Service<unknown>>;
+
+export type ServiceInterceptors = {
+  onerror?: (response: Response) => void;
+  onrequest?: (request: Request) => void;
+  onresponse?: (response: Response) => void;
 };
 
-export type InitConfig = {
-  endpoints: Record<string, string>;
-  options?: RequestInit;
+export type ServiceConfig = {
+  base?: string;
+  endpoints?: Record<string, string>;
+  request?: RequestInit;
+  interceptors?: ServiceInterceptors;
+  throwOnError?: boolean;
+  useBaseURL?: boolean;
+};
+
+export type Context = {
+  useRequests: { services: ServiceMap; config: ServiceConfig };
 };
