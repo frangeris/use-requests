@@ -1,5 +1,5 @@
-import Service from "@/service";
-import Options from "@/options";
+import Service from "@/core/service";
+import Options from "@/global/options";
 
 describe("service", () => {
   beforeEach(() => {
@@ -39,14 +39,16 @@ describe("service", () => {
       expect(url).toBe("/resource/123");
     });
 
-    it("should throw an error if path parameters are missing", () => {
+    it("should throw error if one path parameters are missing", () => {
       const service = new Service("/resource/:id");
-      expect(() => service["buildUrl"]({})).toThrow("Missing path parameters");
+      expect(() => service["buildUrl"]({})).toThrow("Missing parameters :id");
     });
 
-    it("should throw an error if multiple path parameters are missing", () => {
+    it("should throw error if multiple path parameters are missing", () => {
       const service = new Service("/resource/:a/test/:b/test/:c");
-      expect(() => service["buildUrl"]({})).toThrow("Missing path parameters");
+      expect(() => service["buildUrl"]({})).toThrow(
+        "Missing parameters :a, :b, :c"
+      );
     });
 
     it("should include query parameters", () => {
@@ -82,13 +84,13 @@ describe("service", () => {
       Options.instance = jest.fn().mockReturnValue({});
       const service = new Service("/resource");
       expect(() => service["buildRequest"]({ method: "GET" })).toThrow(
-        "Missing baseURL in options"
+        "Missing `base` url in options"
       );
     });
 
-    it("should use the resource as baseURL if bypass is true", async () => {
+    it("should use the resource as baseURL when `useBaseURL` is false", async () => {
       const url = "https://api.example.com/resource";
-      const service = new Service(url, { bypass: true });
+      const service = new Service(url, { useBaseURL: false });
       const req = await service["buildRequest"]({ method: "GET" });
       expect(req.url).toBe(url);
     });
@@ -98,7 +100,7 @@ describe("service", () => {
     it("should return data undefined when body is not present", async () => {
       const service = new Service("/resource");
       const res = await service["buildResponse"](new Response());
-      expect(await res.data).toBeNull();
+      expect(await res?.data).toBeNull();
     });
 
     it("should return an object with data", async () => {
@@ -107,7 +109,7 @@ describe("service", () => {
       const res = await service["buildResponse"](
         new Response(JSON.stringify(dummy))
       );
-      expect(await res.data).toEqual(dummy.data);
+      expect(await res?.data).toEqual(dummy.data);
     });
   });
 });

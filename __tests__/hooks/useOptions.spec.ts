@@ -1,4 +1,4 @@
-import useOptions from "@/useOptions";
+import useOptions from "@/hooks/useOptions";
 
 describe("useOptions", () => {
   it("should return a singleton instance", () => {
