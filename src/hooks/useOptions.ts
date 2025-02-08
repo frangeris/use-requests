@@ -1,4 +1,4 @@
-import Options from "./options";
+import Options from "@/global/options";
 
 export function useOptions() {
   return Options.instance();

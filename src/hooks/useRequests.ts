@@ -1,13 +1,13 @@
 import { Services } from "@/types";
-import context from "@/context";
+import context from "@/global/context";
 
 export function useRequest<T>() {
-  const ctx = context.useRequests;
+  const ctx = context?.();
   if (!ctx) {
     throw new Error("init must be called before using useRequest");
   }
 
-  return context.useRequests as Services<T>;
+  return ctx.services as Services<T>;
 }
 
 export default useRequest;

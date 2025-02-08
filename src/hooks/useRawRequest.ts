@@ -1,8 +1,8 @@
-import Service from "./service";
+import Service from "@/core/service";
 
 export function useRawRequest() {
   return (url: string) => {
-    return new Service(url, { bypass: true });
+    return new Service(url, { useBaseURL: false });
   };
 }
 
