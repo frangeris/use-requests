@@ -3,7 +3,7 @@ export class Options implements RequestInit {
   public baseURL?: string;
 
   // RequestInit
-  headers: Headers = new Headers();
+  headers: Headers;
   cache?: RequestCache;
   method?: string;
   body?: BodyInit | null;
@@ -16,6 +16,7 @@ export class Options implements RequestInit {
   keepalive?: boolean;
 
   private constructor(opts?: RequestInit) {
+    this.headers = new Headers();
     this.baseURL = "";
     if (opts) {
       for (const k in opts) {
