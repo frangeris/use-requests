@@ -1,4 +1,4 @@
-import { init, useRequests, useRawRequest, useOptions } from "../src";
+import { init, useRawRequest, useRequestsConfig, useServices } from "../src";
 
 const base = "https://jsonplaceholder.typicode.com/";
 
@@ -8,19 +8,11 @@ enum Api {
   comments = "/comments",
 }
 
-init({
-  base,
-  endpoints: Api,
-  request: { cache: "no-store" },
-  throwOnError: false,
-  interceptors: {
-    onerror: (r) => {},
-  },
-});
+init({ base, endpoints: Api });
 
 const typed = async () => {
   console.info("✨ Typed requests");
-  const { posts, comments } = useRequests<typeof Api>();
+  const { posts, comments } = useServices<typeof Api>();
 
   let t = await posts.get();
   console.log(t?.status, "GET /posts");
@@ -78,6 +70,6 @@ const raw = async () => {
 
 // run all examples sequentially
 (async () => {
-  // await typed();
+  await typed();
   await raw();
 })();
