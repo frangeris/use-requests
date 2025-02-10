@@ -1,5 +1,5 @@
 import { RequestPath, ServiceConfig, ServiceResponse } from "@/types";
-import Options from "@/global/options";
+import Config from "@/global/config";
 
 export class Service<P> {
   private resource?: string;
@@ -62,7 +62,7 @@ export class Service<P> {
 
   private buildRequest(req: RequestInit & { path?: RequestPath<P> }): Request {
     let baseURL = "";
-    const { headers, baseURL: initialURL } = Options.instance();
+    const { baseURL: initialURL, headers } = Config.instance();
 
     // for normal requests (not raw), base url is required
     if (this.config?.useBaseURL) {
@@ -108,11 +108,14 @@ export class Service<P> {
   }
 
   private async makeRequest(req: Request): Promise<Response | null> {
-    const opts = Options.instance() as RequestInit;
+    const config = Config.instance() as RequestInit;
     let res = null;
 
     try {
-      res = await fetch(req, opts);
+      res = await fetch(req, config);
+      if (this.config?.interceptors?.onresponse) {
+        this.config.interceptors.onresponse(res);
+      }
     } catch (err) {
       if (this.config?.interceptors?.onerror) {
         this.config.interceptors.onerror(res!);

@@ -39,7 +39,7 @@ export type ServiceConfig = {
   endpoints?: Record<string, string>;
   request?: RequestInit;
   interceptors?: ServiceInterceptors;
-  throwOnError?: boolean;
+  // throwOnError?: boolean;
   useBaseURL?: boolean;
 };
 

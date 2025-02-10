@@ -1,10 +1,8 @@
 export * from "@/types";
 
-import init from "@/core/init";
-import useRequests from "@/hooks/useRequests";
-import useOptions from "@/hooks/useOptions";
-import useRawRequest from "@/hooks/useRawRequest";
+export { default as init } from "@/core/init";
+export { default as useServices } from "@/hooks/useServices";
+export { default as useRequestsConfig } from "@/hooks/useRequestsConfig";
+export { default as useRawRequest } from "@/hooks/useRawRequest";
 
-export { init, useRequests, useOptions, useRawRequest };
-
-export default useRequests;
+// export default useServices;

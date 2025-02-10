@@ -1,13 +1,11 @@
 import type { ServiceConfig, ServiceMap } from "@/types";
 import Service from "@/core/service";
-import Options from "@/global/options";
+import Config from "@/global/config";
 import context from "@/global/context";
 
 export function init(config: ServiceConfig) {
   const { endpoints, base, request } = config;
-
-  // request options used by service
-  Options.instance(request).baseURL = base;
+  Config.instance({ baseURL: base, request }).baseURL = base;
 
   // create service client per endpoint with shared options
   const services: ServiceMap = {};
