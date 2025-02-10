@@ -83,9 +83,9 @@ export class Service<P> {
     return request;
   }
 
-  private buildResponse<T>(res?: Response) {
+  private buildResponse<T>(res: Response | null) {
     if (!res) {
-      return null;
+      return new Response(null, { status: 500 }) as ServiceResponse<T>;
     }
 
     // gets populated only when acceded
@@ -107,9 +107,9 @@ export class Service<P> {
     return res as ServiceResponse<T>;
   }
 
-  private async makeRequest(req: Request): Promise<Response | undefined> {
+  private async makeRequest(req: Request): Promise<Response | null> {
     const opts = Options.instance() as RequestInit;
-    let res;
+    let res = null;
 
     try {
       res = await fetch(req, opts);
@@ -118,9 +118,9 @@ export class Service<P> {
         this.config.interceptors.onerror(res!);
       }
 
-      if (this.config?.throwOnError) {
-        throw err;
-      }
+      // if (this.config?.throwOnError) {
+      //   throw err;
+      // }
     }
 
     return res;
