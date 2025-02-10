@@ -14,20 +14,18 @@ export default [
       {
         file: "./dist/index.cjs.js",
         format: "cjs",
-        sourcemap: true,
         exports: "named",
       },
       {
         file: "./dist/index.esm.js",
         format: "esm",
-        sourcemap: true,
         exports: "named",
       },
     ],
     plugins: [
       peerDepsExternal(),
       commonjs(),
-      typescript({ exclude: ["examples/**"] }),
+      typescript({ exclude: ["examples/**", "__tests__/**"] }),
       resolve(),
       terser(),
     ],

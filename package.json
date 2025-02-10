@@ -11,7 +11,7 @@
     "test": "jest",
     "lint": "tsc",
     "build": "rollup -c",
-    "examples": "ts-node examples/index.ts"
+    "examples": "ts-node --compiler-options '{\"module\": \"commonjs\"}' examples/index.ts"
   },
   "repository": {
     "type": "git",
