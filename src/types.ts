@@ -29,19 +29,18 @@ export type ExtractParams<T> =
 export type ServiceMap = Record<string, Service<unknown>>;
 
 export type ServiceInterceptors = {
-  onerror?: (response: Response) => void;
-  onrequest?: (request: Request) => void;
-  onresponse?: (response: Response) => void;
+  onError?: (response: Response) => void;
+  onRequest?: (request: Request) => void;
+  onResponse?: (response: Response) => void;
 };
 
-export type ServiceConfig = {
-  base?: string;
-  endpoints?: Record<string, string>;
-  request?: RequestInit;
+export interface ServiceConfig {
+  baseURL: string;
+  endpoints: Record<string, string>;
   interceptors?: ServiceInterceptors;
-  // throwOnError?: boolean;
+  headers?: Headers;
   useBaseURL?: boolean;
-};
+}
 
 export type Context = {
   useRequests: { services: ServiceMap; config: ServiceConfig };

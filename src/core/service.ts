@@ -4,14 +4,12 @@ import Config from "@/global/config";
 export class Service<P> {
   private resource?: string;
   private controller: AbortController;
-  private config?: ServiceConfig;
 
-  constructor(resource?: string, config?: ServiceConfig) {
+  constructor(resource?: string) {
     if (resource) {
       this.resource = resource;
     }
 
-    this.config = Object.assign({ useBaseURL: true, ...config });
     this.controller = new AbortController();
   }
 
@@ -62,12 +60,12 @@ export class Service<P> {
 
   private buildRequest(req: RequestInit & { path?: RequestPath<P> }): Request {
     let baseURL = "";
-    const { baseURL: initialURL, headers } = Config.instance();
+    const { baseURL: initialURL, headers, useBaseURL } = Config.instance();
 
     // for normal requests (not raw), base url is required
-    if (this.config?.useBaseURL) {
+    if (useBaseURL) {
       if (!initialURL) {
-        throw new Error("Missing `base` url in options");
+        throw new Error("Missing `baseURL` url in options");
       }
       baseURL = initialURL;
     }
@@ -108,18 +106,16 @@ export class Service<P> {
   }
 
   private async makeRequest(req: Request): Promise<Response | null> {
-    const config = Config.instance() as RequestInit;
+    const { interceptors, headers } = Config.instance();
     let res = null;
 
     try {
-      res = await fetch(req, config);
-      if (this.config?.interceptors?.onresponse) {
-        this.config.interceptors.onresponse(res);
+      res = await fetch(req, { headers });
+      if (interceptors?.onResponse) {
+        interceptors.onResponse(res);
       }
     } catch (err) {
-      if (this.config?.interceptors?.onerror) {
-        this.config.interceptors.onerror(res!);
-      }
+      interceptors?.onError?.(res!);
 
       // if (this.config?.throwOnError) {
       //   throw err;

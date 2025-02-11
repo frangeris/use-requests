@@ -1,26 +1,30 @@
-export class Config {
-  static #instance: Config;
-  public baseURL?: string;
-  public request?: RequestInit;
-  public headers?: Headers;
+import { ServiceConfig, ServiceInterceptors } from "@/types";
 
-  private constructor(config?: Config) {
-    this.headers = new Headers();
+export class Config implements ServiceConfig {
+  static #instance: Config;
+
+  baseURL: string;
+  endpoints: Record<string, string>;
+  interceptors: ServiceInterceptors;
+  headers: Headers;
+  useBaseURL?: boolean;
+
+  private constructor(config: ServiceConfig) {
     this.baseURL = "";
-    this.request = {};
+    this.useBaseURL = true;
+    this.endpoints = {};
+    this.interceptors = {};
+    this.headers = new Headers();
 
     if (config) {
-      for (const k in config) {
-        (this as any)[k] = (config as any)[k];
-      }
+      Object.assign(this, config);
     }
   }
 
-  public static instance(config?: Config): Config {
-    if (!Config.#instance) {
+  public static instance(config?: ServiceConfig): Config {
+    if (!Config.#instance && config) {
       Config.#instance = new Config(config);
     }
-
     return Config.#instance;
   }
 }

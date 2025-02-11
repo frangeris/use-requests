@@ -4,14 +4,14 @@ import Config from "@/global/config";
 import context from "@/global/context";
 
 export function init(config: ServiceConfig) {
-  const { endpoints, base, request } = config;
-  Config.instance({ baseURL: base, request }).baseURL = base;
+  Config.instance(config);
 
   // create service client per endpoint with shared options
+  const { endpoints } = config;
   const services: ServiceMap = {};
   for (const key in endpoints) {
     Object.assign(services, {
-      [key]: new Service<unknown>(endpoints[key], config),
+      [key]: new Service<unknown>(endpoints[key]),
     });
   }
 
