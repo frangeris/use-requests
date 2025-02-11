@@ -9,7 +9,7 @@ export class Config implements ServiceConfig {
   headers: Headers;
   useBaseURL?: boolean;
 
-  private constructor(config: ServiceConfig) {
+  private constructor(config?: ServiceConfig) {
     this.baseURL = "";
     this.useBaseURL = true;
     this.endpoints = {};
@@ -22,7 +22,7 @@ export class Config implements ServiceConfig {
   }
 
   public static instance(config?: ServiceConfig): Config {
-    if (!Config.#instance && config) {
+    if (!Config.#instance) {
       Config.#instance = new Config(config);
     }
     return Config.#instance;

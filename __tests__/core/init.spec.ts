@@ -1,8 +1,8 @@
 import type { Context } from "@/types";
 import { init } from "@/core/init";
-import { Options } from "@/global/options";
 import Service from "@/core/service";
-import useRequest from "@/hooks/useRequests";
+import Config from "@/global/config";
+import useServices from "@/hooks/useServices";
 
 enum Test {
   endpoint1 = "/endpoint1",
@@ -11,14 +11,14 @@ enum Test {
 }
 
 describe("init", () => {
-  const base = "http://api.example.io";
+  const baseURL = "http://api.example.io";
   beforeEach(() => {
     jest.clearAllMocks();
-    init({ base, endpoints: Test });
+    init({ baseURL, endpoints: Test });
   });
 
   it("should set the baseURL correctly", () => {
-    expect(Options.instance().baseURL).toBe(base);
+    expect(Config.instance().baseURL).toBe(baseURL);
   });
 
   it("should define globalThis.useRequests correctly", () => {
@@ -27,7 +27,7 @@ describe("init", () => {
   });
 
   it("should create services correctly", () => {
-    const svs = useRequest<typeof Test>();
+    const svs = useServices<typeof Test>();
     expect(svs.endpoint1).toBeDefined();
     expect(svs.endpoint1).toBeInstanceOf(Service);
 
