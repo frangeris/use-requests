@@ -7,6 +7,8 @@ import alias from "@rollup/plugin-alias";
 import typescript from "@rollup/plugin-typescript";
 import terser from "@rollup/plugin-terser";
 
+const aliasEntries = [{ find: "@", replacement: path.resolve("./src") }];
+
 export default [
   {
     input: "./src/index.ts",
@@ -23,6 +25,7 @@ export default [
       },
     ],
     plugins: [
+      alias({ entries: aliasEntries }),
       peerDepsExternal(),
       commonjs(),
       typescript({ exclude: ["examples/**", "__tests__/**"] }),
@@ -34,11 +37,6 @@ export default [
   {
     input: "./src/index.ts",
     output: [{ file: "./dist/index.d.ts", format: "esm" }],
-    plugins: [
-      alias({
-        entries: [{ find: "@", replacement: path.resolve("./src") }],
-      }),
-      dts(),
-    ],
+    plugins: [alias({ entries: aliasEntries }), dts()],
   },
 ];

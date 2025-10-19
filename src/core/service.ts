@@ -110,16 +110,11 @@ export class Service<P> {
     let res = null;
 
     try {
+      interceptors?.onRequest?.(req);
       res = await fetch(req);
-      if (interceptors?.onResponse) {
-        interceptors.onResponse(res);
-      }
+      interceptors?.onResponse?.(res);
     } catch (err) {
-      interceptors?.onError?.(res!);
-
-      // if (this.config?.throwOnError) {
-      //   throw err;
-      // }
+      interceptors?.onError?.(res!, err as Error);
     }
 
     return res;

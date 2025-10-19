@@ -29,7 +29,7 @@ export type ExtractParams<T> =
 export type ServiceMap = Record<string, Service<unknown>>;
 
 export type ServiceInterceptors = {
-  onError?: (response: Response) => void;
+  onError?: (response: Response, error: any) => void;
   onRequest?: (request: Request) => void;
   onResponse?: (response: Response) => void;
 };

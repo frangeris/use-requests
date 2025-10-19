@@ -1,6 +1,6 @@
 ./__tests__/**
-./github/**
-./aseets/**
+.github/**
+./assets/**
 ./docs/**
 ./examples/**
 ./src/**
