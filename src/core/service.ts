@@ -1,4 +1,4 @@
-import { RequestPath, ServiceConfig, ServiceResponse } from "@/types";
+import { RequestPath, ServiceResponse } from "@/types";
 import Config from "@/global/config";
 
 export class Service<P> {
@@ -106,11 +106,11 @@ export class Service<P> {
   }
 
   private async makeRequest(req: Request): Promise<Response | null> {
-    const { interceptors, headers } = Config.instance();
+    const { interceptors } = Config.instance();
     let res = null;
 
     try {
-      res = await fetch(req, { headers });
+      res = await fetch(req);
       if (interceptors?.onResponse) {
         interceptors.onResponse(res);
       }
